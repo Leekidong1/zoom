@@ -1,3 +1,5 @@
+/* Websocket Front-end js*/
+/* 
 const messageList = document.querySelector("ul");
 const nickForm = document.querySelector("#nick");
 const messageForm = document.querySelector("#message");
@@ -38,3 +40,23 @@ function handleNickSubmit(event){
 
 messageForm.addEventListener("submit", handleSubmit);
 nickForm.addEventListener("submit", handleNickSubmit);
+*/
+
+/* SocketIO Front-end js*/
+const socket = io();
+
+const welcome = document.getElementById("welcome");
+const form = welcome.querySelector("form");
+
+function backendDone(msg){
+    console.log(`The backend says : `, msg);
+}
+
+function handleRoomSubmit(event){
+    event.preventDefault();
+    const input = form.querySelector("input");
+    socket.emit("enter_room", input.value, backendDone);
+    input.value = "";
+}
+
+form.addEventListener("submit", handleRoomSubmit);

@@ -1,5 +1,6 @@
 import http from "http";
-import WebSocket from "ws";
+//import WebSocket from "ws";
+import SocketIO from "socket.io";
 import express from "express";
 
 const app = express();
@@ -12,11 +13,21 @@ app.get("/*", (req, res) => res.redirect("/"));
 
 const handleListen = () => console.log('Listening on http://localhost:3000');
 
-const server = http.createServer(app); // http서버
+const httpServer = http.createServer(app); // http서버
+const wsServer = SocketIO(httpServer); // SocketIO 서버 불러옴
+
+wsServer.on("connection", (socket) => {
+    socket.on("enter_room", (roomName, done) => {
+        console.log(roomName);
+        setTimeout(() => {
+            done("hello from the backend");
+        }, 5000);
+    });
+});
+
+/*
 const wss = new WebSocket.Server({ server }); // 1. Websocket 서버생성
-
 const sockets = [];
-
 wss.on("connection", (socket) => { // 2. connection 이벤트 listen
     sockets.push(socket);
     socket["nickname"] = "Anon";
@@ -33,5 +44,5 @@ wss.on("connection", (socket) => { // 2. connection 이벤트 listen
         }
     });
 });
-
-server.listen(3000, handleListen);
+*/
+httpServer.listen(3000, handleListen);
