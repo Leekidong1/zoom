@@ -13,15 +13,25 @@ app.get("/*", (req, res) => res.redirect("/"));
 const handleListen = () => console.log('Listening on http://localhost:3000');
 
 const server = http.createServer(app); // http서버
-const wss = new WebSocket.Server({ server }); // Websocket 서버
+const wss = new WebSocket.Server({ server }); // 1. Websocket 서버생성
 
-wss.on("connection", (socket) => {
+const sockets = [];
+
+wss.on("connection", (socket) => { // 2. connection 이벤트 listen
+    sockets.push(socket);
+    socket["nickname"] = "Anon";
     console.log("Connected to Browser");
     socket.on("close", () => console.log("Disconected from Client"));
-    socket.on("message", (message) => {
-        console.log(message.toString('utf-8'));
+    socket.on("message", (msg) => {
+        const message = JSON.parse(msg);
+
+        switch(message.type){
+            case "new_message":
+                sockets.forEach((aSocket) => aSocket.send(`${socket.nickname}: ${message.payload.toString('utf-8')}`)); // 다른 브라우저로 메세진 전달
+            case "nickname":
+                socket["nickname"] = message.payload;
+        }
     });
-    socket.send("hello!!");
 });
 
 server.listen(3000, handleListen);
