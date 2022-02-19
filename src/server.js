@@ -11,7 +11,13 @@ app.use("/public", express.static(__dirname + "/public"));
 app.get("/", (req, res) => res.render("home"));
 app.get("/*", (req, res) => res.redirect("/"));
 
+const httpServer = http.createServer(app); // http서버
+const wsServer = SocketIO(httpServer); // SocketIO 서버 불러옴
+
 const handleListen = () => console.log('Listening on http://localhost:3000');
+httpServer.listen(3000, handleListen);
+
+/*********************************** SocketIO 버전 ****************************
 
 const httpServer = http.createServer(app); // http서버
 const wsServer = SocketIO(httpServer); // SocketIO 서버 불러옴
@@ -66,8 +72,9 @@ wsServer.on("connection", (socket) => {
 
     socket.on("nickname", (nickname) => (socket["nickname"] = nickname));
 });
+*/
 
-/*
+/*********************************** Websocket 버전 ****************************
 const wss = new WebSocket.Server({ server }); // 1. Websocket 서버생성
 const sockets = [];
 wss.on("connection", (socket) => { // 2. connection 이벤트 listen
@@ -87,4 +94,3 @@ wss.on("connection", (socket) => { // 2. connection 이벤트 listen
     });
 });
 */
-httpServer.listen(3000, handleListen);
