@@ -14,8 +14,27 @@ app.get("/*", (req, res) => res.redirect("/"));
 const httpServer = http.createServer(app); // http서버
 const wsServer = SocketIO(httpServer); // SocketIO 서버 불러옴
 
+wsServer.on("connection", (socket) => {
+    socket.on("join_room", (roomName) => {
+        socket.join(roomName);
+        socket.to(roomName).emit("welcome");
+    });
+    socket.on("offer", (offer, roomName) => {
+        socket.to(roomName).emit("offer", offer);
+    });
+    socket.on("answer", (answer, roomName) => {
+        socket.to(roomName).emit("answer", answer);
+    });
+    socket.on("ice", (ice, roomName) => {
+        socket.to(roomName).emit("ice", ice);
+    });
+});
+
 const handleListen = () => console.log('Listening on http://localhost:3000');
 httpServer.listen(3000, handleListen);
+
+
+
 
 /*********************************** SocketIO 버전 ****************************
 
@@ -73,6 +92,10 @@ wsServer.on("connection", (socket) => {
     socket.on("nickname", (nickname) => (socket["nickname"] = nickname));
 });
 */
+
+
+
+
 
 /*********************************** Websocket 버전 ****************************
 const wss = new WebSocket.Server({ server }); // 1. Websocket 서버생성
